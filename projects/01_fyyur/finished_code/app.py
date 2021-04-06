@@ -424,8 +424,8 @@ def shows():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data = []
   objects = db.session.query(Show).all()
+  show = {}
   for obj in objects:
-    show = {}
     show["venue_id"] = obj.venue_id
     show["venue_name"] = obj.venue.name
     show["artist_id"] = obj.artist_id
