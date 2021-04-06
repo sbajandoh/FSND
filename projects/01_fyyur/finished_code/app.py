@@ -422,6 +422,7 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
+  showRel = db.session.query(Show).join(Artist).join(Venue).all()
   data = []
   objects = db.session.query(Show).all()
   show = {}
