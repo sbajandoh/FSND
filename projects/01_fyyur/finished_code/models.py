@@ -1,6 +1,12 @@
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+def db_setup(app):
+    app.config.from_object('config')
+    db.app = app
+    db.init_app(app)
+    migrate = Migrate(app, db)
+    return db
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -31,7 +37,7 @@ class Venue(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-
+    
 
 
 
@@ -71,3 +77,15 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.update(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
