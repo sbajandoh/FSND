@@ -77,6 +77,7 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    upcoming = db.Column(db.Boolean, nullable=False, default=True)
 
     def add(self):
         db.session.add(self)
