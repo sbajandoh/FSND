@@ -12,22 +12,19 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
 app = Flask(__name__)
-moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db) # this
 # TODO: connect to a local postgresql database
-def db_setup(app):
-    app.config.from_object('config')
-    db.app = app
-    db.init_app(app)
-    migrate = Migrate(app, db)
-    return db
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
@@ -50,6 +47,7 @@ class Venue(db.Model):
     upcoming_counter = db.Column(db.Integer, default=0)
     seekingDescription = db.Column(db.String(500))
     website = db.Column(db.String(120))
+    
     def add(self):
         db.session.add(self)
         db.session.commit()
@@ -100,7 +98,7 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
+    upcoming = db.Column(db.Boolean, nullable=False, default=True)
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 #----------------------------------------------------------------------------#
@@ -216,16 +214,16 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   try:
       venue_form = VenueForm(request.form)
-      new_venue = Venue(
-        name=venue_form.name.data,
-        genres=','.join(venue_form.genres.data),
-        address=venue_form.address.data,
-        city=venue_form.city.data,
-        state=venue_form.state.data,
-        phone=venue_form.phone.data,
-        facebook_link=venue_form.facebook_link.data,
-        image_link=venue_form.image_link.data)
-      new_venue.add()
+      newVenue = Venue()
+      newVenue.name=venue_form.name.data,
+      newVenue.genres=','.join(venue_form.genres.data),
+      newVenue.address=venue_form.address.data,
+      newVenue.city=venue_form.city.data,
+      newVenue.state=venue_form.state.data,
+      newVenue.phone=venue_form.phone.data,
+      newVenue.facebook_link=venue_form.facebook_link.data,
+      newVenue.image_link=venue_form.image_link.data
+      newVenue.add()
   # on successful db insert, flash success
       flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
@@ -398,19 +396,19 @@ def create_artist_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
   try:
-    new_venue = Venue(
-      name=request.form['name'],
-      genres=request.form.getlist('genres'),
-      address=request.form['address'],
-      city=request.form['city'],
-      state=request.form['state'],
-      phone=request.form['phone'],
-      website=request.form['website'],
-      facebook_link=request.form['facebook_link'],
-      image_link=request.form['image_link'],
-      seeking_talent=request.form['seeking_talent'],
-      description=request.form['seekingDescription'],
-    )
+    newArtist = Venue()
+    newArtist.name=request.form['name'],
+    newArtist.genres=request.form.getlist('genres'),
+    newArtist.address=request.form['address'],
+    newArtist.city=request.form['city'],
+    newArtist.state=request.form['state'],
+    newArtist.phone=request.form['phone'],
+    newArtist.website=request.form['website'],
+    newArtist.facebook_link=request.form['facebook_link'],
+    newArtist.image_link=request.form['image_link'],
+    newArtist.seeking_talent=request.form['seeking_talent'],
+    newArtist.description=request.form['seekingDescription'],
+    
     #insert new venue records into the db
     Venue.insert(new_venue)
     # on successful db insert, flash success
