@@ -129,8 +129,7 @@ def venues():
   venues = db.session.query(Venue.city,Venue.state).group_by(Venue.state,Venue.city).all()
   data = []
   for area in venues:
-    venues = db.session.query(Venue.id,Venue.name,
-      Venue.upcoming_counter).filter(Venue.city==area[0],Venue.state==area[1]).all()
+    venues = db.session.query(Venue.id,Venue.name,Venue.upcoming_counter).filter(Venue.city==area[0],Venue.state==area[1]).all()
     data.append({
         "city": area[0],
         "state": area[1],
