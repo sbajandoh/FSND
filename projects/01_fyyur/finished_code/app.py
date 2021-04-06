@@ -205,57 +205,58 @@ def show_venue(venue_id):
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  venue_form = VenueForm(request.form)
-
   try:
-        new_venue = Venue(
-            name=venue_form.name.data,
-            genres=','.join(venue_form.genres.data),
-            address=venue_form.address.data,
-            city=venue_form.city.data,
-            state=venue_form.state.data,
-            phone=venue_form.phone.data,
-            facebook_link=venue_form.facebook_link.data,
-            image_link=venue_form.image_link.data)
-
-        new_venue.add()
+      venue_form = VenueForm(request.form)
+      new_venue = Venue(
+        name=venue_form.name.data,
+        genres=','.join(venue_form.genres.data),
+        address=venue_form.address.data,
+        city=venue_form.city.data,
+        state=venue_form.state.data,
+        phone=venue_form.phone.data,
+        facebook_link=venue_form.facebook_link.data,
+        image_link=venue_form.image_link.data)
+      new_venue.add()
   # on successful db insert, flash success
-        flash('Venue ' + request.form['name'] + ' was successfully listed!')
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
+  except Exception as ex:
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  except Exception as ex:
-        flash('An error occurred. Venue ' +
-              request.form['name'] + ' could not be listed.')
-        traceback.print_exc()
+    
+
   return render_template('pages/home.html')
+
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-  venue = Venue.query.get_or_404(venue_id)
-  if len(venue.shows):
+  try:
+    venue = Venue.query.get_or_404(venue_id)
+    if len(venue.shows):
       flash('Unable to remove the venue on which shows are held!')
       return redirect(url_for('show_venue', venue_id = venue_id))
-  data = {}
-  data['name'] = venue.name
-  try:
-    venue.genres = []
-    db.session.delete(venue)
-    db.session.commit()
-    flash('Venue ' + data['name'] + ' has been deleted.')
+      data = {}
+      data['name'] = venue.name
+  
+      venue.genres = []
+      db.session.delete(venue)
+      db.session.commit()
+      flash('Venue ' + data['name'] + ' has been deleted.')
   except:
-    db.session.rollback()
-    print(sys.exc_info())
-    flash('Venue ' + data['name'] + ' could not be deleted.')
-  finally:
-    db.session.close()
+      db.session.rollback()
+      print(sys.exc_info())
+      flash('Venue ' + data['name'] + ' could not be deleted.')
+  
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
   
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
+  finally:
+      db.session.close()
   return redirect(url_for('index'))
   return None
 
@@ -422,8 +423,8 @@ def shows():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data = []
-  show_objs = db.session.query(Show).all()
-  for obj in show_objs:
+  objects = db.session.query(Show).all()
+  for obj in objects:
     show = {}
     show["venue_id"] = obj.venue_id
     show["venue_name"] = obj.venue.name
